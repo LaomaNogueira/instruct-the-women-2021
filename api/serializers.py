@@ -16,12 +16,12 @@ class PackageSerializer(serializers.ModelSerializer):
             validated_data = latest_version(data["name"])
 
             if validated_data == None:
-                raise serializers.ValidationError({"error": "One or more packages doesn't exist"})
+                raise serializers.ValidationError()
 
             return validated_data
         
         if not version_exists(data["name"], data["version"]):
-            raise serializers.ValidationError({"error": "One or more packages doesn't exist"})
+            raise serializers.ValidationError()
 
         validated_data = {"name": data["name"], "version": data["version"]}
         return validated_data
@@ -35,12 +35,9 @@ class ProjectSerializer(serializers.ModelSerializer):
     packages = PackageSerializer(many=True)
 
     def create(self, validated_data):
-
-        project = Project.objects.filter(name=validated_data["name"]).first()
         
-        if project == None:
-            project = Project(name=validated_data["name"])
-            project.save()
+        project = Project(name=validated_data["name"])
+        project.save()
 
         for package in validated_data["packages"]:
             package_release = PackageRelease(
