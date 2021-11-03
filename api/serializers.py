@@ -40,6 +40,11 @@ class ProjectSerializer(serializers.ModelSerializer):
         project.save()
 
         for package in validated_data["packages"]:
+            exist = PackageRelease.objects.filter(name=package["name"], project_id=project.id)
+                        
+            if exist:
+                continue
+
             package_release = PackageRelease(
                 project_id=project.id, 
                 name=package["name"], 
